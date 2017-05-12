@@ -2,16 +2,21 @@ package utils
 
 import (
 	"net/http"
-	"github.com/vvotm/webimgspider/except"
+	"github.com/vvotm/gospider/except"
 	"io/ioutil"
+	"fmt"
 )
 
 func FetchUrl(url string) (content string){
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(url + " not ok")
+		}
+	}()
 	if url[:4] != "http" {
 		url = "http:" + url
 	}
-	resp, err := http.Get(url)
-	except.ErrorHandler(err)
+	resp, _ := http.Get(url)
 	defer resp.Body.Close()
 
 	bytes, err := ioutil.ReadAll(resp.Body)

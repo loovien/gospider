@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"fmt"
-	"github.com/vvotm/webimgspider/app"
+	"github.com/vvotm/gospider/app"
 )
 
 func main()  {
@@ -11,7 +11,7 @@ func main()  {
 	argsLength := len(args)
 	if argsLength == 1 {
 		fmt.Println(`
-	Use: webimgspider {url} [savepath] [totalpage]
+	Use: gospider {url} [savepath] [totalpage]
 	url: website which you want fetch
 	savepath: the path image will save
 	totalpage: it will replace {page} to fetch image.

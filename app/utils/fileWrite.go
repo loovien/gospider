@@ -2,7 +2,7 @@ package utils
 
 import (
 	"os"
-	"github.com/vvotm/webimgspider/except"
+	"github.com/vvotm/gospider/except"
 	"io"
 )
 
