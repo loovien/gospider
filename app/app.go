@@ -8,28 +8,31 @@ import (
 	"sync"
 	"os"
 	"math/rand"
-	"net/http"
-	"io/ioutil"
+	"github.com/vvotm/webimgspider/app/typeMatch"
+	"github.com/vvotm/webimgspider/app/utils"
+	"fmt"
 )
+
 
 var wg sync.WaitGroup
 
 func Run(url string, path string, page string) {
 	regex := regexp.MustCompile("\\{page\\}")
-
-	page, err = strconv.Atoi(page)
+	newPage, err := strconv.Atoi(page)
 	except.ErrorHandler(err)
-
-	if page > 0 && regex.FindAllString(url, -1) != nil {
-		for i := 1; i <= page ; i++  {
+	if newPage > 0 && regex.FindAllString(url, -1) != nil {
+		for i := 1; i <= newPage ; i++  {
 			wg.Add(1)
 			pageIndex := strconv.Itoa(i)
-			url = strings.Replace(url, "\\{page\\}", pageIndex , 0)
+			fmt.Println(pageIndex)
+			newUrl := strings.Replace(url, "{page}", pageIndex, -1)
+			fmt.Println(newUrl)
 			go fetch(url, path)
 		}
+	} else {
+		wg.Add(1)
+		go fetch(url, path)
 	}
-
-	go fetch(url, path)
 	wg.Wait()
 }
 
@@ -51,17 +54,15 @@ func fetch(url, path string)  {
 		os.Mkdir(path, 755)
 	}
 
-	resp, err := http.Get(url)
-	except.ErrorHandler(err)
-	defer resp.Body.Close()
+	content := utils.FetchUrl(url)
+	types := []string{"jpg", "png", "gif"}
+	resultSet := typeMatch.GetImgSlice(content, -1, types)
 
-	file, err := os.Create(imgname)
-	defer file.Close()
-	except.ErrorHandler(err)
-
-	bytes, err := ioutil.ReadAll(resp.Body)
-	except.ErrorHandler(err)
-	file.Write(bytes)
-
+	for _, url := range(resultSet)  {
+		imgStr := utils.FetchUrl(url)
+		lastSlashIndex := strings.LastIndex(url, "/")
+		filename := strings.Trim(path, "/") + "/" + url[lastSlashIndex+1:]
+		utils.WriteFile(imgStr, filename)
+	}
 	wg.Done()
 }

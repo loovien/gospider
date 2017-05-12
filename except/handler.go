@@ -1,8 +1,10 @@
 package except
 
+import "log"
 
 func ErrorHandler (err error) {
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		recover()
 	}
 }
